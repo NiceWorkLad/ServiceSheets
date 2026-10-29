@@ -289,7 +289,7 @@ const DEFAULT_WORDS = {
   access:   ['high chair','wheelchair','pram','buggy','mobility','walking stick','walking frame','step free','accessible'],
 };// ---------------------------------------------------------------------------
 
-const SAMPLE = `Time,Name,Covers,Table(s),Booking,Guest Comments,Special offers and promotions
+const SAMPLE = `Time,Name,Covers,Table(s),Booking Comments,Guest Comments,Special Offers & Promotions
 12:30,Sarah Thompson,2,1,BK48201,Celebrating mum's birthday,Afternoon Tea for Two
 12:30,Gareth Hughes,4,2,BK48202,,Prosecco Afternoon Tea
 12:45,Priya Shah,2,4,BK48203,"Vegetarian, one guest gluten free",Afternoon Tea for Two
@@ -476,8 +476,8 @@ const tableKey = id => id ? (id[0] === 'B' ? 1000 : 0) + Number(id.slice(1)) : 9
 
 const HEADERS = {
   time:['time','bookingtime','arrival'], name:['name','guestname','guest'], covers:['covers','pax','guests','partysize'],
-  tables:['tables','table','tablenumber'], booking:['booking','bookingref','reference','ref'],
-  comments:['guestcomments','comments','notes'], offer:['specialoffersandpromotions','specialoffers','offers','promotions','offer']
+  tables:['tables','table','tablenumber'], booking:['bookingcomments','booking','bookingref','reference','ref'],
+  comments:['guestcomments','comments','notes'], offer:['specialofferspromotions','specialoffersandpromotions','specialoffers','offers','promotions','offer']
 };
 function toBookings(text){
   const rows = parseCSV(text);
