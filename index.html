@@ -376,8 +376,8 @@ const COLUMNS = [ // width in % of the table; null = takes the remaining space
   {key:'table', label:'Table',          w:10},
   {key:'cov',   label:'Covers',         w:9},
   {key:'notes', label:'Guest comments', w:null},
-  {key:'offer', label:'Offer',          w:16},
-  {key:'ref',   label:'Booking',        w:10},
+  {key:'offer', label:'Special Offers &amp; Promotions', w:16},
+  {key:'ref',   label:'Booking Comments', w:10},
 ];
 let hiddenCols = (() => { try { const v = JSON.parse(localStorage.getItem(COL_STORE) || '[]'); return new Set(Array.isArray(v) ? v : []); } catch (e) { return new Set(); } })();
 function saveCols(){ try { localStorage.setItem(COL_STORE, JSON.stringify([...hiddenCols])); } catch (e) { saveFailed = true; } }
