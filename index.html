@@ -498,6 +498,7 @@ function toBookings(text){
   return { bookings, skipped };
 }
 
+const flagsHTML = list => list.length ? `<div class="flags">${list.map(f => `<span class="flag ${f.key}">${f.label}</span>`).join('')}</div>` : '';
 function annotate(text){
   const hits = [], keys = new Set();
   for (const rule of FLAG_RULES){
@@ -547,7 +548,7 @@ function sheetHTML(title, list, source){
     if (unknown.length) warns.push(`${unknown.join(', ')} not on the plan`);
     const seats = b.tables.reduce((n,t) => n + (CAP.get(t) || 0), 0);
     if (b.tables.length && !unknown.length && b.covers > seats) warns.push(`Over capacity: seats ${seats}`);
-    const flags = allFlags.length ? `<div class="flags">${allFlags.map(f => `<span class="flag ${f.key}">${f.label}</span>`).join('')}</div>` : '';
+    const flags = flagsHTML(allFlags);
     const ed = (f, html, cls = '') => `<span class="ed${cls}" contenteditable="true" spellcheck="false" data-f="${f}">${html}</span>`;
     const cell = {
       seat:  `<button type="button" class="box" aria-pressed="${!!b.ticked}" aria-label="Tick: ${esc(b.name)}"></button>`,
@@ -706,7 +707,43 @@ $('sheets').addEventListener('focusout', e => {
 $('sheets').addEventListener('keydown', e => {
   const el = e.target.closest?.('.ed'); if (!el) return;
   if (e.key === 'Enter'){ e.preventDefault(); el.blur(); }
-  else if (e.key === 'Escape'){ e.preventDefault(); el.innerHTML = el.dataset.orig || ''; el.blur(); }
+  else if (e.key === 'Escape'){ e.preventDefault(); el.innerHTML = el.dataset.orig || ''; liveCheck(el, false); el.blur(); }
+});
+// Re-check keywords live while typing in guest or booking comments
+function caretPos(el){
+  const sel = getSelection(); if (!sel.rangeCount || !el.contains(sel.anchorNode)) return null;
+  const r = sel.getRangeAt(0).cloneRange(); r.selectNodeContents(el); r.setEnd(sel.anchorNode, sel.anchorOffset);
+  return r.toString().length;
+}
+function setCaret(el, pos){
+  const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT); let n;
+  while ((n = w.nextNode())){
+    if (pos <= n.length){ const r = document.createRange(); r.setStart(n, pos); r.collapse(true); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); return; }
+    pos -= n.length;
+  }
+  const r = document.createRange(); r.selectNodeContents(el); r.collapse(false); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+}
+function liveCheck(el, keepCaret = true){
+  const tr = el.closest('tr'); if (!tr) return;
+  const fields = ['comments', 'ref'].map(f => tr.querySelector(`.ed[data-f="${f}"]`));
+  if (!fields.includes(el)) return;
+  const b = current?.bookings.find(x => x.id === +tr.dataset.id);
+  const text = f => { const e = tr.querySelector(`.ed[data-f="${f}"]`); return e ? e.textContent : (b?.[f] || ''); };
+  const a = annotate(text(el.dataset.f));
+  if (el.innerHTML !== a.html){
+    const pos = keepCaret ? caretPos(el) : null;
+    el.innerHTML = a.html;
+    if (pos !== null) setCaret(el, pos);
+  }
+  const ac = annotate(text('comments')), ar = annotate(text('ref'));
+  const all = FLAG_RULES.filter(r => ac.flags.includes(r) || ar.flags.includes(r));
+  const notes = tr.querySelector('.c-notes');
+  if (notes){ notes.querySelector('.flags')?.remove(); notes.insertAdjacentHTML('afterbegin', flagsHTML(all)); }
+  tr.classList.toggle('alert', all.some(f => f.key === 'allergy'));
+}
+$('sheets').addEventListener('input', e => {
+  const el = e.target.closest?.('.ed'); if (!el || e.isComposing) return;
+  liveCheck(el);
 });
 // Paste as plain text so formatting from other apps doesn't come along
 $('sheets').addEventListener('paste', e => {
