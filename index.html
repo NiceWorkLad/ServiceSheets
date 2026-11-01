@@ -165,6 +165,14 @@ tbody tr:nth-child(even) td{background:var(--zebra)}
 tr.alert td:first-child{border-left:.4em solid var(--red)}
 /* Black and white printing: red becomes black, emphasis moves to underline and rings */
 .bw .sheet{--red:var(--ink)}
+/* Sample data: big watermark and striped banners so it can't be mistaken for a real night */
+.sample-mark{position:absolute;inset:0;z-index:5;pointer-events:none;overflow:hidden;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.sample-mark .wm{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-32deg);font-weight:800;font-size:46mm;letter-spacing:.06em;
+  line-height:1;color:transparent;-webkit-text-stroke:.7mm var(--red);opacity:.28;white-space:nowrap}
+.sample-mark .band{position:absolute;left:0;right:0;height:7mm;display:flex;align-items:center;justify-content:center;
+  background:repeating-linear-gradient(-45deg,var(--red) 0 3mm,var(--paper) 3mm 6mm)}
+.sample-mark .band span{background:var(--paper);color:var(--red);border:.5mm solid var(--red);padding:.6mm 3mm;font-weight:800;font-size:8pt;letter-spacing:.12em;text-transform:uppercase}
+.sample-mark .top{top:2mm} .sample-mark .bot{bottom:2mm}
 .bw mark.hot{text-decoration:underline;text-decoration-thickness:.12em;text-underline-offset:.15em}
 .bw .warn{text-decoration:underline}
 .bw .flag.severe{box-shadow:0 0 0 .12em var(--paper),0 0 0 .26em var(--ink)}
@@ -576,7 +584,8 @@ function sheetHTML(title, list, source){
 
 
   const day = dateLabel();
-  return `<section class="sheet"><div class="sheet-inner">
+  const sample = current.source === 'Sample data' ? `<div class="sample-mark" aria-hidden="true"><div class="band top"><span>Sample data · made-up bookings · not a real service</span></div><div class="wm">SAMPLE</div><div class="band bot"><span>Sample data · drop your CSV export to replace</span></div></div>` : '';
+  return `<section class="sheet${sample ? ' is-sample' : ''}">${sample}<div class="sheet-inner">
     <div class="head">
       <div><div class="title">${esc(title)}</div><div class="sub">${esc(day)}</div></div>
       <div class="totals"><div><b>${list.length}</b><span class="cap">Bookings</span></div><div><b>${covers}</b><span class="cap">Covers</span></div></div>
