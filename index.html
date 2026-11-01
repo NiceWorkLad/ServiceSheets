@@ -173,6 +173,19 @@ tr.alert td:first-child{border-left:.4em solid var(--red)}
   background:repeating-linear-gradient(-45deg,var(--red) 0 3mm,var(--paper) 3mm 6mm)}
 .sample-mark .band span{background:var(--paper);color:var(--red);border:.5mm solid var(--red);padding:.6mm 3mm;font-weight:800;font-size:8pt;letter-spacing:.12em;text-transform:uppercase}
 .sample-mark .top{top:2mm} .sample-mark .bot{bottom:2mm}
+/* On screen the sample is faded with a drop card over it; the SAMPLE watermark is for paper only */
+.is-sample .sheet-inner{opacity:.38;transition:opacity .15s}
+.is-sample:focus-within .sheet-inner{opacity:1}
+.sample-mark .wm{display:none}
+.sample-drop{position:absolute;left:50%;top:58mm;transform:translateX(-50%);z-index:6;width:min(78%,118mm);box-sizing:border-box;
+  display:flex;flex-direction:column;align-items:center;gap:10px;padding:28px 24px 24px;text-align:center;font-family:var(--font);
+  background:var(--chrome);color:var(--chrome-fg);border:2px dashed var(--chrome-fg);box-shadow:0 10px 30px var(--shadow);cursor:pointer}
+.sample-drop:hover,.sample-drop.over{border-style:solid;border-color:var(--accent)}
+.sample-drop .big{width:44px;height:44px;color:var(--accent)}
+.sample-drop b{font-size:22px;letter-spacing:-.01em}
+.sample-drop p{margin:0;font-size:14px;line-height:1.45;color:var(--muted)}
+.sample-drop .btn{margin-top:4px;font-size:15px;padding:10px 18px}
+@media print{.sample-drop{display:none!important}.is-sample .sheet-inner{opacity:1}.sample-mark .wm{display:block}}
 .bw mark.hot{text-decoration:underline;text-decoration-thickness:.12em;text-underline-offset:.15em}
 .bw .warn{text-decoration:underline}
 .bw .flag.severe{box-shadow:0 0 0 .12em var(--paper),0 0 0 .26em var(--ink)}
@@ -305,7 +318,7 @@ const DEFAULT_WORDS = {
   access:   ['high chair','wheelchair','pram','buggy','mobility','walking stick','walking frame','step free','accessible'],
 };// ---------------------------------------------------------------------------
 
-const ICONS = {'eye':'<path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/> <circle cx="12" cy="12" r="3"/>','eye-off':'<path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49"/> <path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"/> <path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143"/> <path d="m2 2 20 20"/>','pencil':'<path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/> <path d="m15 5 4 4"/>','check':'<path d="M20 6 9 17l-5-5"/>','plus':'<path d="M5 12h14"/> <path d="M12 5v14"/>','rotate-ccw':'<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/> <path d="M3 3v5h5"/>','x':'<path d="M18 6 6 18"/> <path d="m6 6 12 12"/>'}; // Lucide icons (ISC licence)
+const ICONS = {'upload':'<path d="M12 3v12"/> <path d="m17 8-5-5-5 5"/> <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>','folder-open':'<path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"/>','eye':'<path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/> <circle cx="12" cy="12" r="3"/>','eye-off':'<path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49"/> <path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"/> <path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143"/> <path d="m2 2 20 20"/>','pencil':'<path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/> <path d="m15 5 4 4"/>','check':'<path d="M20 6 9 17l-5-5"/>','plus':'<path d="M5 12h14"/> <path d="M12 5v14"/>','rotate-ccw':'<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/> <path d="M3 3v5h5"/>','x':'<path d="M18 6 6 18"/> <path d="m6 6 12 12"/>'}; // Lucide icons (ISC licence)
 const ico = n => `<svg class="i" viewBox="0 0 24 24" aria-hidden="true">${ICONS[n]}</svg>`;
 const SAMPLE = `Time,Name,Covers,Table(s),Booking Comments,Guest Comments,Special Offers & Promotions
 12:30,Sarah Thompson,2,1,BK48201,Celebrating mum's birthday,Afternoon Tea for Two
@@ -584,7 +597,7 @@ function sheetHTML(title, list, source){
 
 
   const day = dateLabel();
-  const sample = current.source === 'Sample data' ? `<div class="sample-mark" aria-hidden="true"><div class="band top"><span>Sample data · made-up bookings · not a real service</span></div><div class="wm">SAMPLE</div><div class="band bot"><span>Sample data · drop your CSV export to replace</span></div></div>` : '';
+  const sample = current.source === 'Sample data' ? `<div class="sample-drop" data-pick role="group" aria-label="Load your bookings">${ico('upload').replace('class="i"', 'class="i big"')}<b>Drop your CSV here</b><p>This is a sample with made-up bookings.<br>Drop the day's CSV export on this card, or anywhere on the page.</p><button class="btn primary" type="button" data-pick>${ico('folder-open')}Choose file</button></div><div class="sample-mark" aria-hidden="true"><div class="band top"><span>Sample data · made-up bookings · not a real service</span></div><div class="wm">SAMPLE</div><div class="band bot"><span>Sample data · drop your CSV export to replace</span></div></div>` : '';
   return `<section class="sheet${sample ? ' is-sample' : ''}">${sample}<div class="sheet-inner">
     <div class="head">
       <div><div class="title">${esc(title)}</div><div class="sub">${esc(day)}</div></div>
@@ -671,7 +684,7 @@ $('print').addEventListener('click', () => {
 // Accept a dropped file anywhere on the page; the drop box just lights up while dragging.
 let depth = 0;
 const zone = $('pick');
-const over = on => zone.classList.toggle('over', on);
+const over = on => { zone.classList.toggle('over', on); document.querySelectorAll('.sample-drop').forEach(d => d.classList.toggle('over', on)); };
 document.addEventListener('dragenter', e => { e.preventDefault(); depth++; over(true); });
 document.addEventListener('dragover', e => { e.preventDefault(); if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy'; });
 document.addEventListener('dragleave', () => { depth = Math.max(0, depth-1); if (!depth) over(false); });
@@ -683,6 +696,8 @@ document.addEventListener('drop', e => {
   else setStatus("That drop didn't include a file. Drag the CSV from your files, or click the box to choose it.", true);
 });
 addEventListener('beforeprint', fit);
+// The drop card over the sample opens the file picker too
+$('sheets').addEventListener('click', e => { if (e.target.closest('[data-pick]')) $('file').click(); });
 // Seated boxes: tick on screen, or leave blank and tick by pen on the printout
 $('sheets').addEventListener('click', e => {
   const box = e.target.closest('.box'); if (!box) return;
