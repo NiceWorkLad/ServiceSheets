@@ -18,6 +18,7 @@ The CSV needs a header row with at least a `Time` column. The tool also reads `N
 - Tags guest comments for **allergies**, severe allergies, dietary needs, occasions and access needs, using keyword lists you can edit
 - Warns about over-capacity bookings and tables that aren't on the plan
 - Shrinks text to fit each sheet on one A4 page
+- About page with a privacy explainer, diagrams and a click-through tour of the page
 - Tick box per booking, editable cells, column order and visibility, portrait or landscape, black and white or colour
 
 Allergy tags are a prompt, not a guarantee: they only catch what was typed into the booking. Always confirm allergies with the guest at the table.
