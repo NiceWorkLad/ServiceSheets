@@ -538,7 +538,8 @@ function sheetHTML(title, list, source){
   let prev = null;
   const rows = list.map(b => {
     const isFirst = b.t !== prev; prev = b.t;
-    const a = annotate(b.comments);
+    const a = annotate(b.comments), ar = annotate(b.ref); // keywords count in booking comments too
+    const allFlags = FLAG_RULES.filter(r => a.flags.includes(r) || ar.flags.includes(r));
     const warns = [];
     const unknown = b.tables.filter(n => !CAP.has(n));
     if (b.outside) warns.push(b.outside);
@@ -546,7 +547,7 @@ function sheetHTML(title, list, source){
     if (unknown.length) warns.push(`${unknown.join(', ')} not on the plan`);
     const seats = b.tables.reduce((n,t) => n + (CAP.get(t) || 0), 0);
     if (b.tables.length && !unknown.length && b.covers > seats) warns.push(`Over capacity: seats ${seats}`);
-    const flags = a.flags.length ? `<div class="flags">${a.flags.map(f => `<span class="flag ${f.key}">${f.label}</span>`).join('')}</div>` : '';
+    const flags = allFlags.length ? `<div class="flags">${allFlags.map(f => `<span class="flag ${f.key}">${f.label}</span>`).join('')}</div>` : '';
     const ed = (f, html, cls = '') => `<span class="ed${cls}" contenteditable="true" spellcheck="false" data-f="${f}">${html}</span>`;
     const cell = {
       seat:  `<button type="button" class="box" aria-pressed="${!!b.ticked}" aria-label="Tick: ${esc(b.name)}"></button>`,
@@ -556,9 +557,9 @@ function sheetHTML(title, list, source){
       cov:   ed('covers', b.covers || '') + (b.covers ? '<span class="cv">CV</span>' : ''),
       notes: `${flags}${ed('comments', a.html, ' ctext')}${warns.map(w => `<span class="warn">${esc(w)}</span>`).join('')}`,
       offer: ed('offer', esc(b.offer)),
-      ref:   ed('ref', esc(b.ref)),
+      ref:   ed('ref', ar.html),
     };
-    return `<tr data-id="${b.id}" class="${isFirst ? 'first' : ''}${a.flags.some(f => f.key === 'allergy') ? ' alert' : ''}">`
+    return `<tr data-id="${b.id}" class="${isFirst ? 'first' : ''}${allFlags.some(f => f.key === 'allergy') ? ' alert' : ''}">`
       + cols.map(c => `<td class="c-${c.key}">${cell[c.key]}</td>`).join('') + `</tr>`;
   }).join('');
 
@@ -738,7 +739,7 @@ function renderKwView(){
 function renderKwSummary(){
   renderKwView();
   const on = CATS.reduce((n, c) => n + words[c.key].filter(x => x.on).length, 0);
-  $('kw-summary').textContent = `${on} words across ${CATS.length} tags (${CATS.map(c => c.label).join(', ')}) decide what gets flagged in guest comments.`;
+  $('kw-summary').textContent = `${on} words across ${CATS.length} tags (${CATS.map(c => c.label).join(', ')}) decide what gets flagged in guest and booking comments.`;
 }
 function renderPanel(){
   $('mode-bw').checked = mono; $('mode-colour').checked = !mono;
