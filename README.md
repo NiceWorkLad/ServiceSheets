@@ -10,7 +10,7 @@ Turns the restaurant's booking CSV export into clean, printable A4 service sheet
 2. Open the page and drop the CSV on it (or click the box to choose it).
 3. Check the sheets, edit any cell if something needs changing, then print.
 
-The CSV needs a header row with at least a `Time` column. The tool also reads `Name`, `Covers`, `Table(s)`, `Booking`, `Guest Comments` and `Special offers and promotions`.
+The CSV needs a header row with at least a `Time` column. The tool also reads `Name`, `Covers`, `Table(s)`, `Booking Comments`, `Guest Comments` and `Special Offers & Promotions`.
 
 ## What it does
 
@@ -31,3 +31,4 @@ Everything happens in the browser. The page makes no network requests and the CS
 - `index.html`: the whole tool in one file, including the embedded font
 - `samples/`: example CSVs with made-up bookings for trying it out
 - `fonts/OFL-Atkinson-Hyperlegible.txt`: licence for the embedded Atkinson Hyperlegible font (Braille Institute, SIL Open Font License 1.1)
+- `fonts/LICENSE-Lucide.txt`: licence for the button and tab icons, from [Lucide](https://lucide.dev) (ISC). They're embedded in `index.html`, so the page still makes no network requests.
